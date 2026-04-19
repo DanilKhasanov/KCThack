@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface SkillRepository extends JpaRepository<Skills, Long> {
-    List<Skills> findByCategory(Skills category);
+    List<Skills> findByCategory(SkillsCategory category);
 
     boolean existsByName(String name);
 

@@ -72,7 +72,5 @@ public class AdminService {
         return user;
     }
 
-    public User updateUser(String id) {
-        return null;
-    }
+
 }

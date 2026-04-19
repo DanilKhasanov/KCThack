@@ -75,15 +75,12 @@ public class SecurityConfiguration {
                 )
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/schedule").permitAll()
-                        .requestMatchers("/swagger-ui.html").permitAll()
-                        .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers("/v3/api-docs/**").permitAll()
-                        .requestMatchers("/secured/user/**").hasRole("USER")
-                        .requestMatchers("/api/secured/**").hasRole("USER")
-                        .requestMatchers("/admin").hasRole("ADMIN")
-                        .requestMatchers("/judge").hasRole("JUDGE")
-                        .anyRequest().permitAll()
+                        .requestMatchers("/api/schedule/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/judge/**").hasRole("JUDGE")
+                        .requestMatchers("/api/events/**").hasAnyRole("USER","ADMIN","JUDGE")
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class);
 

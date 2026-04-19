@@ -13,6 +13,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -96,21 +97,20 @@ public class UserService implements UserDetailsService {
 
 
     public String userToSignIn(SigninRequest signinRequest){
-        User user = userRepository.findUserByUsername(signinRequest.getUsername()).orElse(null);
-        if(user.getStatus() != UserStatus.ACTIVE){
-            throw new EntityNotFoundException("Валли");
+        User user = userRepository.findUserByUsername(signinRequest.getUsername())
+                .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
+
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            throw new BadCredentialsException("Account is blocked or deleted");
         }
-        Authentication authentication = null;
+        Authentication auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        signinRequest.getUsername(), signinRequest.getPassword()
+                )
+        );
 
-             authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            signinRequest.getUsername(),
-                            signinRequest.getPassword()
-                    )
-            );
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        return  jwtCore.generateToken(authentication);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        return  jwtCore.generateToken(auth);
 
     }
 

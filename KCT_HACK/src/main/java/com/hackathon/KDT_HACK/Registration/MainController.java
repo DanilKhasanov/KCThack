@@ -25,7 +25,7 @@ public class MainController {
     }
 
     @GetMapping("/user/{id}")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.id")
     public User userAccess(@PathVariable("id") String id){
 
         return  userService.findUser(id);

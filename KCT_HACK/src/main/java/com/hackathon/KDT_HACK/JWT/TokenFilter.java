@@ -8,6 +8,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +22,8 @@ import java.io.IOException;
 @Component
 public class TokenFilter extends OncePerRequestFilter {
 
+
+    private static final Logger log = LoggerFactory.getLogger(TokenFilter.class);
     @Autowired
     private JwtCore jwtCore;
 
@@ -39,11 +43,12 @@ public class TokenFilter extends OncePerRequestFilter {
             String headerAuth = request.getHeader("Authorization");
             if (headerAuth != null && headerAuth.startsWith("Bearer ")) {
                 jwt = headerAuth.substring(7);
-                System.out.println("JWT token received: " + jwt); // Логирование
+//                System.out.println("JWT token received: " + jwt); // Логирование
             }
 
             if (jwt != null) {
                     userId = jwtCore.getIdFromJwt(jwt);
+                    log.debug("Authenticating user with id: {}", userId);
 
 
                 if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {

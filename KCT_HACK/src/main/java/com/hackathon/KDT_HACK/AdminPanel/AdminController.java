@@ -55,9 +55,9 @@ public class AdminController {
 
     @PostMapping("/update-user/{id}")
     public ResponseEntity<?> updateUser(
-            @PathVariable("id") String id,
-            UpdateUserRequest updateUserRequest){
-        return ResponseEntity.ok().body(userService.updateUser(updateUserRequest, id));
+            @PathVariable String id,
+            @Valid @RequestBody UpdateUserRequest updateUserRequest) {
+        return ResponseEntity.ok(userService.updateUser(updateUserRequest, id));
     }
 
     @PostMapping("/block-user/{id}")
