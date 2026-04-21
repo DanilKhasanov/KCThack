@@ -79,7 +79,6 @@ public class UserService implements UserDetailsService {
         User user = new User();
         user.setName(signupRequest.getName());
         user.setLastName(signupRequest.getLastname());
-        user.setFullName(signupRequest.getName()+" "+signupRequest.getLastname());
         user.setUsername(signupRequest.getUsername());
         user.setBirthday(signupRequest.getBirthday());
         user.setEmail(signupRequest.getEmail());
@@ -88,6 +87,7 @@ public class UserService implements UserDetailsService {
         user.setStatus(UserStatus.ACTIVE);
         user.setCreatedAt(LocalDate.now());
         user.setPoints(0);
+        user.setTokenVersion(0);
         userRepository.save(user);
 
 
@@ -123,10 +123,14 @@ public class UserService implements UserDetailsService {
                 userRepository.existsUserByUsername(updateUserRequest.getUsername())) {
             throw new IllegalArgumentException("Username already taken");
         }
+        // Проверка email
+        if (!user.getEmail().equals(updateUserRequest.getEmail()) &&
+                userRepository.existsUserByEmail(updateUserRequest.getEmail())) {
+            throw new IllegalArgumentException("Email already taken");
+        }
 
         user.setName(updateUserRequest.getName());
         user.setLastName(updateUserRequest.getLastName());
-        user.setFullName(updateUserRequest.getName()+" "+updateUserRequest.getLastName());
         user.setUsername(updateUserRequest.getUsername());
         user.setBirthday(updateUserRequest.getBirthday());
         user.setAvatar(updateUserRequest.getAvatar());
@@ -134,11 +138,13 @@ public class UserService implements UserDetailsService {
         user.setPhone(updateUserRequest.getPhone());
         user.setTelegram(updateUserRequest.getTelegram());
         user.setGithub(updateUserRequest.getGithub());
-        user.setJob(updateUserRequest.getJob());          // поле job (было Job)
+        user.setJob(updateUserRequest.getJob());
         user.setLevel(updateUserRequest.getLevel());
 
         // Преобразование DTO в сущности UserSkill
-        List<UserSkill> newSkills = updateUserRequest.getSkills().stream()
+        List<UserSkill> newSkills = updateUserRequest.getSkills() == null
+                ? List.of()
+                : updateUserRequest.getSkills().stream()
                 .map(dto -> {
                     Skills skill = new Skills();
                     skill.setId(dto.getSkillId());       // берём skillId из DTO
@@ -200,6 +206,14 @@ public class UserService implements UserDetailsService {
 
         // Хешируем новый пароль и сохраняем
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setTokenVersion(user.getTokenVersion() + 1); //инвалидируем старый токен
+        userRepository.save(user);
+    }
+    //инвалидация токена(log out/block/delete)
+    public void invalidateUserTokens(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
+        user.setTokenVersion(user.getTokenVersion() + 1);
         userRepository.save(user);
     }
 

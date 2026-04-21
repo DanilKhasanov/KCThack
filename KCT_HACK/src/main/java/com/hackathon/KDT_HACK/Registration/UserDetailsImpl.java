@@ -24,6 +24,7 @@ public class UserDetailsImpl implements UserDetails {
     private String password;
     private UserRole role;
     private UserStatus status;
+    private  int tokenVersion;
 
 
 
@@ -37,7 +38,8 @@ public class UserDetailsImpl implements UserDetails {
                 user.getEmail(),
                 user.getPassword(),
                 user.getRole(),
-                user.getStatus()
+                user.getStatus(),
+                user.getTokenVersion()
 
         );
 

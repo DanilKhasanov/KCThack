@@ -35,14 +35,14 @@ public class AdminController {
 //Skills
     @PostMapping("/add-skills")
 //    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> SkillsToAdd(@RequestBody List<Skills> skills){
+    public ResponseEntity<?> addSkills(@RequestBody List<Skills> skills){
         adminService.addSkills(skills);
         return ResponseEntity.ok(new ResponseDTO("Skills added successfully"));
     }
 
     @DeleteMapping("/delete-skills")
 //    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> SkillsToRemove(@RequestBody List<Skills> skills){
+    public ResponseEntity<?> removeSkills(@RequestBody List<Skills> skills){
         adminService.deleteSkills(skills);
         return ResponseEntity.ok(new ResponseDTO("Skills deleted successfully"));
     }

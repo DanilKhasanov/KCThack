@@ -29,7 +29,7 @@ public class User   {
     private String lastName;
 
     @Column(name = "full_name", nullable = false)
-    private String fullName = name+" "+lastName;
+    private String fullName;
 
 
     @Column(name = "username", nullable = false, unique = true)
@@ -84,6 +84,15 @@ public class User   {
 
     @Column(name = "points")
     private int points;
+
+    @Column(name = "token_version", nullable = false)
+    private int tokenVersion = 0;
+
+    @PrePersist
+    @PreUpdate
+    private void updateFullName() {
+        this.fullName = this.name + " " + this.lastName;
+    }
 
 
 

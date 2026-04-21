@@ -1,0 +1,8 @@
+spring.profiles.active=dev
+
+
+data.user.pass=${USER PASSWORD}
+
+data.admin.pass=${ADMIN PASSWORD}
+
+data.judge.pass=${JUDGE PASSWORD}

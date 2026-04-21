@@ -1,7 +1,10 @@
 package com.hackathon.KDT_HACK.JWT;
 
+import com.hackathon.KDT_HACK.Registration.UserDetailsImpl;
 import com.hackathon.KDT_HACK.Registration.UserService;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 
 @Component
 public class TokenFilter extends OncePerRequestFilter {
@@ -43,22 +47,43 @@ public class TokenFilter extends OncePerRequestFilter {
             String headerAuth = request.getHeader("Authorization");
             if (headerAuth != null && headerAuth.startsWith("Bearer ")) {
                 jwt = headerAuth.substring(7);
-//                System.out.println("JWT token received: " + jwt); // Логирование
+
             }
 
             if (jwt != null) {
                     userId = jwtCore.getIdFromJwt(jwt);
                     log.debug("Authenticating user with id: {}", userId);
+                    Claims claims = Jwts.parser()
+                            .verifyWith(jwtCore.getSigningKey())
+                            .build()
+                            .parseSignedClaims(jwt)
+                            .getPayload();
+                    Integer tokenVersion = claims.get("tv", Integer.class);
 
 
                 if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = userService.loadUserById(userId);
+
+                    if (userDetails instanceof UserDetailsImpl) {
+                        int currentVersion = ((UserDetailsImpl) userDetails).getTokenVersion();
+                        if (tokenVersion != currentVersion) {
+                            throw new AccessDeniedException("Token version mismatch - invalidated");
+                        }
+                    }
+
+                    if (!userDetails.isEnabled() || !userDetails.isAccountNonLocked()) {
+                        throw new AccessDeniedException("User is not active or blocked");
+                    }
+
+
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
                             userDetails.getAuthorities()
                     );
                     SecurityContextHolder.getContext().setAuthentication(auth);
+
+
 
                 }
             }

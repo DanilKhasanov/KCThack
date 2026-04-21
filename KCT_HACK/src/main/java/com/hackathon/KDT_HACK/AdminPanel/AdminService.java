@@ -59,6 +59,7 @@ public class AdminService {
                     .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
 
             user.setStatus(UserStatus.BLOCKED);
+            user.setTokenVersion(user.getTokenVersion()+1);
             userRepository.save(user);
             return user;
     }
@@ -68,6 +69,7 @@ public class AdminService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
 
         user.setStatus(UserStatus.DELETED);
+        user.setTokenVersion(user.getTokenVersion()+1);
         userRepository.save(user);
         return user;
     }

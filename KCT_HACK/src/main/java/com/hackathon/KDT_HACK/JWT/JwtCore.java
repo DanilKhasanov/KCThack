@@ -22,7 +22,7 @@ public class JwtCore {
     @Value("${jwt.lifetime}")
     private int lifetime;
 
-    private SecretKey getSigningKey() {
+    protected SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretJwtKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
@@ -32,6 +32,7 @@ public class JwtCore {
         return Jwts.builder()
                 .subject(userDetails.getId())
                 .claim("role", userDetails.getRole().name())
+                .claim("tv", userDetails.getTokenVersion())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + lifetime))
                 .signWith(getSigningKey())

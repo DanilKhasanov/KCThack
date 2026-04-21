@@ -8,13 +8,16 @@ import com.hackathon.KDT_HACK.PersonalAccount.Skills.SkillsCategory;
 import com.hackathon.KDT_HACK.PersonalAccount.Skills.UserSkill;
 import com.hackathon.KDT_HACK.Registration.*;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Profile("dev")
 @AllArgsConstructor
 @Component
 public class DataLoader implements CommandLineRunner {
@@ -23,6 +26,15 @@ public class DataLoader implements CommandLineRunner {
     private final AchievementsRepository achievementsRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @Value("{data.admin.pass}")
+    private String adminPass;
+
+    @Value("{data.user.pass}")
+    private String userPass;
+
+    @Value("{data.judge.pass}")
+    private String judgePass;
 
     @Override
     public void run(String... args) {
@@ -102,7 +114,7 @@ public class DataLoader implements CommandLineRunner {
         User user = createUser(
                 "Иван", "Петров",  "ivan_user", "ivan@example.com",
                 "+79123456789", "https://t.me/ivan_user", "https://github.com/ivan_user",
-                LocalDate.of(1995, 6, 15), "password123", "avatar_user.png",
+                LocalDate.of(1995, 6, 15), userPass , "avatar_user.png",
                 UserRole.USER, UserStatus.ACTIVE, UserJob.BACK, UserLevel.BEGINNER,
                 0, LocalDate.now(), allSkills
         );
@@ -111,7 +123,7 @@ public class DataLoader implements CommandLineRunner {
         User admin = createUser(
                 "Мария", "Сидорова", "maria_admin", "maria@example.com",
                 "+79223334455", "https://t.me/maria_admin", "https://github.com/maria_admin",
-                LocalDate.of(1988, 3, 22), "adminPass", "avatar_admin.png",
+                LocalDate.of(1988, 3, 22), adminPass, "avatar_admin.png",
                 UserRole.ADMIN, UserStatus.ACTIVE, UserJob.PROJECT, UserLevel.ADVANCED,
                 0, LocalDate.now(), allSkills
         );
@@ -120,7 +132,7 @@ public class DataLoader implements CommandLineRunner {
         User judge = createUser(
                 "Алексей", "Козлов", "alex_judge", "alex@example.com",
                 "+79334445566", "https://t.me/alex_judge", "https://github.com/alex_judge",
-                LocalDate.of(1992, 11, 5), "judgePass", "avatar_judge.png",
+                LocalDate.of(1992, 11, 5), judgePass, "avatar_judge.png",
                 UserRole.JUDGE, UserStatus.ACTIVE, UserJob.GAME, UserLevel.INTERMEDIATE,
                 0, LocalDate.now(), allSkills
         );
