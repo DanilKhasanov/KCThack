@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.hackathon</groupId>
-	<artifactId>KСThack</artifactId>
+	<artifactId>KCThack</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>KDT_HACK</name>
 	<description>Hackathon community</description>

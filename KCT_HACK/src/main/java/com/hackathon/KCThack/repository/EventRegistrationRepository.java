@@ -20,7 +20,7 @@ public interface EventRegistrationRepository extends JpaRepository<EventRegistra
     long countByScheduleIdAndType(Long scheduleId, RegistrationType type);
 
     @Query("""
-        SELECT new com.hackathon.KDT_HACK.dto.EventRegistrationDto(
+        SELECT new com.hackathon.KCThack.dto.EventRegistrationDto(
             er.id, 
             er.user.id,
             er.user.fullName, 

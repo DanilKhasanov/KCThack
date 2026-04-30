@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/KCThack.iml" filepath="$PROJECT_DIR$/.idea/KCThack.iml" />
+      <module fileurl="file://$PROJECT_DIR$/KCT_HACK/KDT_HACK.iml" filepath="$PROJECT_DIR$/KCT_HACK/KDT_HACK.iml" />
     </modules>
   </component>
 </project>
