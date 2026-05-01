@@ -1,5 +1,7 @@
 package com.hackathon.KCThack.dto;
 
+import com.hackathon.KCThack.annotation.NoProfanity;
+import com.hackathon.KCThack.enums.Gender;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -15,14 +17,17 @@ public class SignupRequest {
     @NotBlank(message = "Введите имя")
     @Size(min = 2, max = 100, message = "ФИО должно содержать от 2 до 100 символов")
     @Pattern(regexp = "^[\\p{L}\\s\\-']+$", message = "Только буквы, пробелы, дефис и апостроф")
+    @NoProfanity
     private String name;
 
     @NotBlank(message = "Введите фамилию")
     @Size(min = 2, max = 100, message = "Фамилия должна содержать от 2 до 100 символов")
     @Pattern(regexp = "^[\\p{L}\\s\\-']+$", message = "Только буквы, пробелы, дефис и апостроф")
+    @NoProfanity
     private String lastname;
 
    @NotBlank(message = "Введите имя пользователя")
+   @NoProfanity
     private String username;
 
 
@@ -35,6 +40,10 @@ public class SignupRequest {
     @Size(min = 8, max = 100, message = "Пароль должен содержать от 8 до 100 символов")
 
     private String password;
+
+
+    private Gender gender;
+
 
 
 }

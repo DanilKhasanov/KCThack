@@ -7,23 +7,20 @@ import com.hackathon.KCThack.entity.Skills;
 import com.hackathon.KCThack.enums.SkillsCategory;
 import com.hackathon.KCThack.entity.UserSkill;
 import com.hackathon.KCThack.entity.User;
-import com.hackathon.KCThack.enums.UserJob;
-import com.hackathon.KCThack.enums.UserLevel;
-import com.hackathon.KCThack.enums.UserRole;
-import com.hackathon.KCThack.enums.UserStatus;
+import com.hackathon.KCThack.enums.*;
 import com.hackathon.KCThack.repository.UserRepository;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 
-    @Profile("dev")
-@AllArgsConstructor
+@Profile("dev")
 @Component
 public class DataLoader implements CommandLineRunner {
 
@@ -31,17 +28,29 @@ public class DataLoader implements CommandLineRunner {
     private final AchievementsRepository achievementsRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final String adminPass;
+    private final String userPass;
+    private final String judgePass;
 
-    @Value("{data.admin.pass}")
-    private String adminPass;
-
-    @Value("{data.user.pass}")
-    private String userPass;
-
-    @Value("{data.judge.pass}")
-    private String judgePass;
+    @Autowired
+    public DataLoader(SkillRepository skillRepository,
+                      AchievementsRepository achievementsRepository,
+                      UserRepository userRepository,
+                      PasswordEncoder passwordEncoder,
+                      @Value("${data.admin.pass}") String adminPass,
+                      @Value("${data.user.pass}") String userPass,
+                      @Value("${data.judge.pass}") String judgePass) {
+        this.skillRepository = skillRepository;
+        this.achievementsRepository = achievementsRepository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.adminPass = adminPass;
+        this.userPass = userPass;
+        this.judgePass = judgePass;
+    }
 
     @Override
+    @Transactional
     public void run(String... args) {
         loadSkills();
         loadAchievements();
@@ -49,9 +58,7 @@ public class DataLoader implements CommandLineRunner {
     }
 
     private void loadSkills() {
-        if (skillRepository.count() > 0) {
-            return;
-        }
+        if (skillRepository.count() > 0) return;
         List<Skills> skills = List.of(
                 createSkill("Java", SkillsCategory.HARD),
                 createSkill("Spring Boot", SkillsCategory.HARD),
@@ -75,9 +82,7 @@ public class DataLoader implements CommandLineRunner {
     }
 
     private void loadAchievements() {
-        if (achievementsRepository.count() > 0) {
-            return;
-        }
+        if (achievementsRepository.count() > 0) return;
         List<Achievements> achievements = List.of(
                 createAchievement("Новичок", "Набрать 10 очков", "novice.png", 10),
                 createAchievement("Любознательный", "Набрать 50 очков", "curious.png", 50),
@@ -109,37 +114,33 @@ public class DataLoader implements CommandLineRunner {
             return;
         }
 
-        // Получаем существующие навыки для привязки к пользователям
         List<Skills> allSkills = skillRepository.findAll();
         if (allSkills.isEmpty()) {
             System.out.println("No skills found, users will be created without skills.");
         }
 
-        // 1. USER
         User user = createUser(
-                "Иван", "Петров",  "ivan_user", "ivan@example.com",
+                "Иван", "Петров", "ivan_user", "ivan@example.com",
                 "+79123456789", "https://t.me/ivan_user", "https://github.com/ivan_user",
-                LocalDate.of(1995, 6, 15), userPass , "avatar_user.png",
+                LocalDate.of(1995, 6, 15), userPass, "avatar_user.png",
                 UserRole.USER, UserStatus.ACTIVE, UserJob.BACK, UserLevel.BEGINNER,
-                0, LocalDate.now(), allSkills
+                0, LocalDate.now(), Gender.MALE, allSkills
         );
 
-        // 2. ADMIN
         User admin = createUser(
                 "Мария", "Сидорова", "maria_admin", "maria@example.com",
                 "+79223334455", "https://t.me/maria_admin", "https://github.com/maria_admin",
                 LocalDate.of(1988, 3, 22), adminPass, "avatar_admin.png",
                 UserRole.ADMIN, UserStatus.ACTIVE, UserJob.PROJECT, UserLevel.ADVANCED,
-                0, LocalDate.now(), allSkills
+                0, LocalDate.now(), Gender.FEMALE, allSkills
         );
 
-        // 3. JUDGE
         User judge = createUser(
                 "Алексей", "Козлов", "alex_judge", "alex@example.com",
                 "+79334445566", "https://t.me/alex_judge", "https://github.com/alex_judge",
                 LocalDate.of(1992, 11, 5), judgePass, "avatar_judge.png",
                 UserRole.JUDGE, UserStatus.ACTIVE, UserJob.GAME, UserLevel.INTERMEDIATE,
-                0, LocalDate.now(), allSkills
+                0, LocalDate.now(), Gender.MALE, allSkills
         );
 
         userRepository.saveAll(List.of(user, admin, judge));
@@ -148,20 +149,20 @@ public class DataLoader implements CommandLineRunner {
 
     private User createUser(String name, String lastName, String username, String email,
                             String phone, String telegram, String github, LocalDate birthday,
-                            String password, String avatar, UserRole role, UserStatus status,
+                            String rawPassword, String avatar, UserRole role, UserStatus status,
                             UserJob job, UserLevel level, int points, LocalDate createdAt,
-                            List<Skills> allSkills) {
+                            Gender gender, List<Skills> allSkills) {
         User user = new User();
         user.setName(name);
         user.setLastName(lastName);
-        user.setFullName(name + " " + lastName);  // ← добавлено
+        // fullName вычисляется автоматически через @PrePersist, не устанавливаем явно
         user.setUsername(username);
         user.setEmail(email);
         user.setPhone(phone);
         user.setTelegram(telegram);
         user.setGithub(github);
         user.setBirthday(birthday);
-        user.setPassword(passwordEncoder.encode(password));
+        user.setPassword(passwordEncoder.encode(rawPassword));
         user.setAvatar(avatar);
         user.setRole(role);
         user.setStatus(status);
@@ -169,8 +170,9 @@ public class DataLoader implements CommandLineRunner {
         user.setLevel(level);
         user.setPoints(points);
         user.setCreatedAt(createdAt);
+        user.setGender(gender);
+        // tokenVersion остаётся 0 (значение по умолчанию)
 
-        // Добавляем навыки (первые 3)
         if (allSkills != null && !allSkills.isEmpty()) {
             int skillCount = Math.min(3, allSkills.size());
             for (int i = 0; i < skillCount; i++) {

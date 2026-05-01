@@ -13,9 +13,12 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -59,8 +62,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler( exception = {
             IllegalArgumentException.class,
-            IllegalStateException.class,
-            MethodArgumentNotValidException.class
+            IllegalStateException.class
+
     })
     public ResponseEntity<ErrorResponseDto> handlerBadRequest(
             Exception e
@@ -113,4 +116,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponseDto("UsernameException", ex.getMessage(),LocalDateTime.now()));
     }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponseDto> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponseDto("MethodArgumentNotValidException", ex.getMessage(),LocalDateTime.now()));
+    }
+
 }

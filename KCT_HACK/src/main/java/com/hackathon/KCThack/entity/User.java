@@ -1,10 +1,7 @@
 package com.hackathon.KCThack.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.hackathon.KCThack.enums.UserJob;
-import com.hackathon.KCThack.enums.UserLevel;
-import com.hackathon.KCThack.enums.UserRole;
-import com.hackathon.KCThack.enums.UserStatus;
+import com.hackathon.KCThack.enums.*;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -61,6 +58,9 @@ public class User   {
     @Column(name ="password",nullable = false)
     @JsonIgnore
     private String password;
+
+    @Column(name ="gender", nullable = false)
+    private Gender gender;
 
     @Column(name = "avatar")
     private String avatar;

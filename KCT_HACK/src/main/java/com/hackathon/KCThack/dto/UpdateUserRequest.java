@@ -1,5 +1,7 @@
 package com.hackathon.KCThack.dto;
 
+import com.hackathon.KCThack.annotation.NoProfanity;
+import com.hackathon.KCThack.enums.Gender;
 import com.hackathon.KCThack.enums.UserJob;
 import com.hackathon.KCThack.enums.UserLevel;
 import jakarta.validation.constraints.*;
@@ -14,14 +16,17 @@ public class UpdateUserRequest {
     @NotBlank(message = "Введите имя")
     @Size(min = 2, max = 100, message = "ФИО должно содержать от 2 до 100 символов")
     @Pattern(regexp = "^[\\p{L}\\s\\-']+$", message = "Только буквы, пробелы, дефис и апостроф")
+    @NoProfanity
     private String name;
 
     @NotBlank(message = "Введите фамилию")
     @Size(min = 2, max = 100, message = "Фамилия должна содержать от 2 до 100 символов")
     @Pattern(regexp = "^[\\p{L}\\s\\-']+$", message = "Только буквы, пробелы, дефис и апостроф")
+    @NoProfanity
     private String lastName;
 
     @NotBlank(message = "Введите имя пользователя")
+    @NoProfanity
     private String username;
 
     @NotNull(message = "Дата рождения не должна быть пустой")
@@ -32,6 +37,9 @@ public class UpdateUserRequest {
 
     @NotBlank(message = "Введите email")
     private String email;
+
+
+    private Gender gender;
 
     @Pattern(regexp = "^\\+79\\d{9}$", message = "Неправильный формат номера")
     private String phone;

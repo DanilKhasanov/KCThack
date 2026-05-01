@@ -95,6 +95,7 @@ public class UserService implements UserDetailsService {
         user.setBirthday(signupRequest.getBirthday());
         user.setEmail(signupRequest.getEmail());
         user.setPassword(hashed);
+        user.setGender(signupRequest.getGender());
         user.setRole(UserRole.USER);
         user.setStatus(UserStatus.ACTIVE);
         user.setCreatedAt(LocalDate.now());
@@ -147,6 +148,7 @@ public class UserService implements UserDetailsService {
         user.setBirthday(updateUserRequest.getBirthday());
         user.setAvatar(updateUserRequest.getAvatar());
         user.setEmail(updateUserRequest.getEmail());
+        user.setGender(updateUserRequest.getGender());
         user.setPhone(updateUserRequest.getPhone());
         user.setTelegram(updateUserRequest.getTelegram());
         user.setGithub(updateUserRequest.getGithub());
