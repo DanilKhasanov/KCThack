@@ -38,6 +38,8 @@ public class UpdateUserRequest {
     @NotBlank(message = "Введите email")
     private String email;
 
+    private String bio;
+
 
     private Gender gender;
 

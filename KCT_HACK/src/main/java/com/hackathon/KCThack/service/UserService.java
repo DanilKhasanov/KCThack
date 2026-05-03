@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -148,6 +150,7 @@ public class UserService implements UserDetailsService {
         user.setBirthday(updateUserRequest.getBirthday());
         user.setAvatar(updateUserRequest.getAvatar());
         user.setEmail(updateUserRequest.getEmail());
+        user.setBio(updateUserRequest.getBio());
         user.setGender(updateUserRequest.getGender());
         user.setPhone(updateUserRequest.getPhone());
         user.setTelegram(updateUserRequest.getTelegram());
@@ -247,5 +250,27 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
         user.setAchievements(userWithAchievements.getAchievements());
         return user;
+    }
+
+    public List<UserRatingRawDto> findUserPoints(){
+        return userRepository.findAllForRating(PageRequest.of(0, 25));
+    }
+
+    public List<UserRatingDto> getLeaderboard() {
+        List<UserRatingRawDto> users = userRepository.findAllForRating(PageRequest.of(0, 25));
+
+        List<UserRatingDto> result = new ArrayList<>();
+
+        int place = 1;
+
+        for (UserRatingRawDto u : users) {
+            result.add(new UserRatingDto(
+                    place++,
+                    u.getFullName(),
+                    u.getPoints()
+            ));
+        }
+
+        return result;
     }
 }

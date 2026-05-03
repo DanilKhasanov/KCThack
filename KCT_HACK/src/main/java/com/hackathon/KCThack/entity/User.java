@@ -43,6 +43,9 @@ public class User   {
     @Column(name ="email",nullable = false, unique = true)
     private String email;
 
+    @Column(name = "bio")
+    private String bio;
+
     @Column(name="phone")
     private String phone;
 
