@@ -31,7 +31,7 @@ public class MainController {
     }
 
     @GetMapping("/user")
-    @PreAuthorize("isAuthenticated()")
+    //@PreAuthorize("isAuthenticated()")
     public User userAccess(Authentication auth){
         if (!(auth.getPrincipal() instanceof UserDetailsImpl userDetails)) {
             throw new AccessDeniedException("Unauthorized");

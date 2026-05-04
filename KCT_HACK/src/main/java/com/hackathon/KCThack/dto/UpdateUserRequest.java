@@ -50,7 +50,7 @@ public class UpdateUserRequest {
     @Pattern(regexp = "^https://t\\.me/[a-zA-Z0-9][a-zA-Z0-9_]{4,31}$", message = "Неправильный формат телеграм аккаунта")
     private String telegram;
 
-    @Pattern(regexp = "^(https?://)?(www\\.)?github\\.com/[a-zA-Z0-9-]+/?$",
+    @Pattern(regexp = "^https://github\\.com/[a-zA-Z0-9_-]+/?$",
             message = "Неправильный формат ссылки на GitHub")
     @Size(min = 0, max = 200, message = "Ссылка на GitHub не должна превышать 200 символов")
     private String github;

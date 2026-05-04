@@ -252,9 +252,7 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
-    public List<UserRatingRawDto> findUserPoints(){
-        return userRepository.findAllForRating(PageRequest.of(0, 25));
-    }
+
 
     public List<UserRatingDto> getLeaderboard() {
         List<UserRatingRawDto> users = userRepository.findAllForRating(PageRequest.of(0, 25));
