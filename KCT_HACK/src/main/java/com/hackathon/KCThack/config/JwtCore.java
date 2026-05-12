@@ -19,7 +19,7 @@ public class JwtCore {
     private String secretJwtKey;
 
     @Value("${jwt.lifetime}")
-    private int lifetime;
+    private long lifetime;
 
     protected SecretKey getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretJwtKey);

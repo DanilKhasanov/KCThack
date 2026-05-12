@@ -1,5 +1,6 @@
 package com.hackathon.KCThack.entity;
 
+import com.hackathon.KCThack.TeamManagement.model.Team;
 import com.hackathon.KCThack.enums.RegistrationStatus;
 import com.hackathon.KCThack.enums.RegistrationType;
 import jakarta.persistence.*;
@@ -7,12 +8,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "event_registrations",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"user_id", "schedule_id"}) // один пользователь на событие – одна запись
+                @UniqueConstraint(columnNames = {"user_id", "schedule_id"}),
+                @UniqueConstraint(columnNames = {"team_id", "schedule_id"})
         })
 @Getter @Setter
 @NoArgsConstructor
@@ -23,29 +26,36 @@ public class EventRegistration {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "schedule_id", nullable = false)
     private ScheduleEntity schedule;
 
     @Column(name = "registered_at", nullable = false)
-    private LocalDateTime registeredAt;
+    private Instant registeredAt;
 
-    // Тип регистрации: SOLO или TEAM (если поддерживаете команды)
+
     @Enumerated(EnumType.STRING)
     @Column(name = "registration_type", nullable = false)
     private RegistrationType type;
 
-//    // Если регистрация в составе команды – ссылка на команду
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "team_id")
-//    private Team team;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = true)
+    private User user;
 
-    // Статус регистрации (ACTIVE, CANCELLED и т.д.)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id", nullable = true)
+    private Team team;
+
     @Enumerated(EnumType.STRING)
     private RegistrationStatus status = RegistrationStatus.ACTIVE;
+
+    @Column(name = "project_name")
+    private String projectName;
+
+    @Column(name = "project_description")
+    private String projectDescription;
+
+    @Column(name = "result")
+    private String result;
 
     @Override
     public boolean equals(Object o) {
@@ -57,5 +67,12 @@ public class EventRegistration {
     @Override
     public int hashCode() {
         return getClass().hashCode();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (registeredAt == null) {
+            registeredAt = Instant.now();
+        }
     }
 }

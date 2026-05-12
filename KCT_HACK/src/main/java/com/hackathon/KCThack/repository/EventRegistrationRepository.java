@@ -14,24 +14,35 @@ import java.util.Optional;
 @Repository
 public interface EventRegistrationRepository extends JpaRepository<EventRegistration, Long> {
     List<EventRegistration> findByScheduleId(Long scheduleId);
-    List<EventRegistration> findByUserId(String userId);
+
+    Optional<EventRegistration> findByTeamIdAndScheduleId(String teamId, Long scheduleID);
     Optional<EventRegistration> findByUserIdAndScheduleId(String userId, Long scheduleId);
+
+    List<EventRegistration> findByUserId(String userId);
+
     boolean existsByUserIdAndScheduleId(String userId, Long scheduleId);
+    boolean existsByTeamIdAndScheduleId(String userId, Long scheduleId);
     long countByScheduleIdAndType(Long scheduleId, RegistrationType type);
 
     @Query("""
-        SELECT new com.hackathon.KCThack.dto.EventRegistrationDto(
-            er.id, 
-            er.user.id,
-            er.user.fullName, 
-            er.schedule.id, 
-            er.type, 
-            er.status, 
-            er.registeredAt
-        ) 
-        FROM EventRegistration er 
-        WHERE er.schedule.id = :scheduleId
-        
-    """)
+    SELECT new com.hackathon.KCThack.dto.EventRegistrationDto(
+        er.id,
+        er.user.id,
+        er.user.fullName,
+        er.schedule.id,
+        er.type,
+        er.status,
+        er.registeredAt,
+        er.projectName,
+        er.projectDescription,
+        er.result,
+        er.team.id,
+        er.team.name
+    )
+    FROM EventRegistration er
+    LEFT JOIN er.user
+    LEFT JOIN er.team
+    WHERE er.schedule.id = :scheduleId
+""")
     List<EventRegistrationDto> findDtoByScheduleId(@Param("scheduleId") Long scheduleId);
 }

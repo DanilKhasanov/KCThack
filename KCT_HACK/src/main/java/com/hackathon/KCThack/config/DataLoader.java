@@ -9,6 +9,8 @@ import com.hackathon.KCThack.entity.UserSkill;
 import com.hackathon.KCThack.entity.User;
 import com.hackathon.KCThack.enums.*;
 import com.hackathon.KCThack.repository.UserRepository;
+import com.hackathon.KCThack.entity.ScheduleEntity;
+import com.hackathon.KCThack.repository.ScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -17,8 +19,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Profile("dev")
 @Component
@@ -31,6 +37,7 @@ public class DataLoader implements CommandLineRunner {
     private final String adminPass;
     private final String userPass;
     private final String judgePass;
+    private final ScheduleRepository scheduleRepository;
 
     @Autowired
     public DataLoader(SkillRepository skillRepository,
@@ -39,7 +46,8 @@ public class DataLoader implements CommandLineRunner {
                       PasswordEncoder passwordEncoder,
                       @Value("${data.admin.pass}") String adminPass,
                       @Value("${data.user.pass}") String userPass,
-                      @Value("${data.judge.pass}") String judgePass) {
+                      @Value("${data.judge.pass}") String judgePass,
+                      ScheduleRepository scheduleRepository) {
         this.skillRepository = skillRepository;
         this.achievementsRepository = achievementsRepository;
         this.userRepository = userRepository;
@@ -47,6 +55,7 @@ public class DataLoader implements CommandLineRunner {
         this.adminPass = adminPass;
         this.userPass = userPass;
         this.judgePass = judgePass;
+        this.scheduleRepository = scheduleRepository;
     }
 
     @Override
@@ -55,6 +64,7 @@ public class DataLoader implements CommandLineRunner {
         loadSkills();
         loadAchievements();
         loadUsers();
+        loadSchedules();
     }
 
     private void loadSkills() {
@@ -89,7 +99,6 @@ public class DataLoader implements CommandLineRunner {
                 createAchievement("Ветеран", "Набрать 100 очков", "master.png", 25),
                 createAchievement("Железный хакер", "Набрать 500 очков", "expert.png", 50),
                 createAchievement("Хакатон марафонец", "Набрать 1000 очков", "legend.png", 100)
-
         );
         achievementsRepository.saveAll(achievements);
         System.out.println("Loaded " + achievements.size() + " achievements");
@@ -139,7 +148,6 @@ public class DataLoader implements CommandLineRunner {
                 "Game developer и судья хакатонов"
         );
 
-        // 🔥 5 новых пользователей
         User u1 = createUser(
                 "Дмитрий", "Смирнов", "dima_dev", "dima@example.com",
                 "+79001112233", "https://t.me/dima_dev", "https://github.com/dima_dev",
@@ -186,7 +194,6 @@ public class DataLoader implements CommandLineRunner {
         );
 
         userRepository.saveAll(List.of(user, admin, judge, u1, u2, u3, u4, u5));
-
         System.out.println("Loaded 8 users total");
     }
 
@@ -199,7 +206,6 @@ public class DataLoader implements CommandLineRunner {
         User user = new User();
         user.setName(name);
         user.setLastName(lastName);
-        // fullName вычисляется автоматически через @PrePersist, не устанавливаем явно
         user.setUsername(username);
         user.setEmail(email);
         user.setBio(bio);
@@ -216,7 +222,6 @@ public class DataLoader implements CommandLineRunner {
         user.setPoints(points);
         user.setCreatedAt(createdAt);
         user.setGender(gender);
-        // tokenVersion остаётся 0 (значение по умолчанию)
 
         if (allSkills != null && !allSkills.isEmpty()) {
             int skillCount = Math.min(3, allSkills.size());
@@ -229,5 +234,67 @@ public class DataLoader implements CommandLineRunner {
             }
         }
         return user;
+    }
+
+    private void loadSchedules() {
+        if (scheduleRepository.count() > 0) {
+            System.out.println("Schedules already exist, skipping generation.");
+            return;
+        }
+
+        List<Skills> allSkills = skillRepository.findAll();
+        if (allSkills.isEmpty()) {
+            System.out.println("No skills in DB, cannot create schedules.");
+            return;
+        }
+
+        // Вспомогательный метод поиска навыка по имени
+        Skills javaSkill = findSkillByName(allSkills, "Java");
+        Skills springSkill = findSkillByName(allSkills, "Spring Boot");
+        Skills reactSkill = findSkillByName(allSkills, "React");
+        Skills jsSkill = findSkillByName(allSkills, "JavaScript");
+        Skills pythonSkill = findSkillByName(allSkills, "Python");
+
+        ScheduleEntity hackathon1 = new ScheduleEntity();
+        hackathon1.setName("Весенний хакатон 2026");
+        hackathon1.setBriefDescription("Хакатон по веб-разработке");
+        hackathon1.setDescription("48-часовой хакатон для создания веб-приложений с использованием Java, Spring Boot и React.");
+        hackathon1.setStartDateTime(
+                Instant.parse("2026-04-10T10:00:00Z")
+        );
+
+        hackathon1.setEndDateTime(
+                Instant.parse("2026-04-12T18:00:00Z")
+        );
+        // Инициализируем список skills, т.к. в сущности он не инициализирован
+        hackathon1.setSkills(new ArrayList<>());
+        if (javaSkill != null) hackathon1.getSkills().add(javaSkill);
+        if (springSkill != null) hackathon1.getSkills().add(springSkill);
+        if (reactSkill != null) hackathon1.getSkills().add(reactSkill);
+
+        ScheduleEntity hackathon2 = new ScheduleEntity();
+        hackathon2.setName("AI/ML Хакатон 2026");
+        hackathon2.setBriefDescription("Хакатон по искусственному интеллекту");
+        hackathon2.setDescription("Соревнование по созданию ML-моделей и анализу данных с использованием Python.");
+        hackathon2.setStartDateTime(
+                Instant.parse("2026-05-05T09:00:00Z")
+        );
+
+        hackathon2.setEndDateTime(
+                Instant.parse("2026-05-07T20:00:00Z")
+        );
+        hackathon2.setSkills(new ArrayList<>());
+        if (pythonSkill != null) hackathon2.getSkills().add(pythonSkill);
+        if (jsSkill != null) hackathon2.getSkills().add(jsSkill);
+
+        scheduleRepository.saveAll(List.of(hackathon1, hackathon2));
+        System.out.println("Loaded 2 schedules.");
+    }
+
+    private Skills findSkillByName(List<Skills> skills, String name) {
+        return skills.stream()
+                .filter(s -> s.getName().equals(name))
+                .findFirst()
+                .orElse(null);
     }
 }

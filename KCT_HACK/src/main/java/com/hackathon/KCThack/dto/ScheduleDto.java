@@ -2,6 +2,8 @@ package com.hackathon.KCThack.dto;
 
 import com.hackathon.KCThack.entity.Skills;
 import jakarta.validation.constraints.*;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,10 +28,10 @@ public record ScheduleDto(
         List<Skills> skills,
 
         @NotNull
-        LocalDateTime startDateTime,
+        Instant startDateTime,
 
         @NotNull
-        LocalDateTime endDateTime
+        Instant endDateTime
 
 
 

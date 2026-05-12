@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,8 +24,8 @@ public class EventCreateDto {
     List<Long> skillIds;
 
     @NotNull
-    LocalDateTime startDateTime;
+    Instant startDateTime;
 
     @NotNull
-    LocalDateTime endDateTime;
+    Instant endDateTime;
 }
