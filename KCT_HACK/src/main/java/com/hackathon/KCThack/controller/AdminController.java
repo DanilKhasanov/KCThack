@@ -2,12 +2,9 @@ package com.hackathon.KCThack.controller;
 
 
 import com.hackathon.KCThack.dto.*;
-import com.hackathon.KCThack.service.AdminService;
-import com.hackathon.KCThack.service.UserPointsService;
+import com.hackathon.KCThack.service.*;
 import com.hackathon.KCThack.entity.User;
-import com.hackathon.KCThack.service.UserService;
 import com.hackathon.KCThack.dto.ScheduleDto;
-import com.hackathon.KCThack.service.ScheduleService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +23,7 @@ public class AdminController {
     private final UserService userService;
     private final ScheduleService scheduleService;
     private final UserPointsService userPointsService;
+    private final RegistrationService registrationService;
 
 
 
@@ -70,7 +68,7 @@ public class AdminController {
     @PostMapping("/add-points/{id}")
     public ResponseEntity<?> addPoints(@PathVariable String id, @RequestBody @Valid AddPointsRequest points){
 
-        return ResponseEntity.ok().body(userPointsService.addPoints(id, points));
+        return ResponseEntity.ok().body(userPointsService.addPoints(id, points.getPoints()));
     }
 
 
@@ -92,6 +90,13 @@ public class AdminController {
     public ResponseEntity<Void> deleteEvent(@PathVariable("id") Long id){
             scheduleService.deleteEvent(id);
             return ResponseEntity.ok().build();
+    }
+
+//Registrations
+
+    @GetMapping("/event/{eventId}/get-registrations")
+    public ResponseEntity<List<EventRegistrationDto>> getRegistrations(@PathVariable Long eventId) {
+        return ResponseEntity.ok(registrationService.getRegistrationsForEvent(eventId));
     }
 
 

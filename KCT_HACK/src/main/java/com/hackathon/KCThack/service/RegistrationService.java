@@ -3,6 +3,7 @@ package com.hackathon.KCThack.service;
 import com.hackathon.KCThack.TeamManagement.config.TeamProperties;
 import com.hackathon.KCThack.TeamManagement.model.Team;
 import com.hackathon.KCThack.TeamManagement.repository.TeamMemberRepository;
+import com.hackathon.KCThack.TeamManagement.repository.TeamRepository;
 import com.hackathon.KCThack.TeamManagement.service.TeamService;
 import com.hackathon.KCThack.dto.UpdateRegistrationDto;
 import com.hackathon.KCThack.enums.RegistrationStatus;
@@ -36,15 +37,25 @@ public class RegistrationService {
     private final TeamService teamService;
     private final TeamMemberRepository teamMemberRepository;
     private final TeamProperties teamProperties;
+    private final TeamRepository teamRepository;
 
     @Transactional
     public EventRegistration registerSolo(String userId, Long eventId) {
         User user = userRepository.findById(userId).orElseThrow();
         ScheduleEntity schedule = scheduleRepository.findById(eventId)
-                .orElseThrow(() -> new EntityNotFoundException("Not found event by id: "+ eventId));
+                .orElseThrow(() -> new EntityNotFoundException("Не найден ивент с id: "+ eventId));
+
+        if (schedule.getStatus() != ScheduleStatus.PENDING){
+            throw new IllegalStateException("Невозможно зарегистрироваться - регистрация окончена");
+        }
 
         if (registrationRepository.existsByUserIdAndScheduleId(userId, eventId)) {
-            throw new IllegalStateException("User already registered for this event");
+            throw new IllegalStateException("Вы уже зарегистрированы на ивент");
+        }
+        Team userTeam = teamRepository.findTeamsByUserId(user.getId()).getFirst();
+
+        if (userTeam != null) {
+            throw new IllegalStateException("Невозможно зарегистрироваться одному так, как вы в команде: "+ userTeam.getName() );
         }
 
         EventRegistration reg = new EventRegistration();
@@ -62,6 +73,10 @@ public class RegistrationService {
 
         ScheduleEntity schedule = scheduleRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Не найден ивент с id: "+ eventId));
+
+        if (schedule.getStatus() != ScheduleStatus.PENDING){
+            throw new IllegalStateException("Невозможно зарегистрироваться - регистрация окончена");
+        }
 
         Team team = teamService.getUserTeams(userId).getFirst();
         if (team == null) {

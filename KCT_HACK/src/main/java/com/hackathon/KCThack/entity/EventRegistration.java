@@ -57,6 +57,9 @@ public class EventRegistration {
     @Column(name = "result")
     private String result;
 
+    @Column(name = "place")
+    private int place;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

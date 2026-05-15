@@ -63,7 +63,8 @@ public class ScheduleService {
                 eventToCreate.getDescription(),
                 managedSkills,
                 eventToCreate.getStartDateTime(),
-                eventToCreate.getEndDateTime()
+                eventToCreate.getEndDateTime(),
+                false
         );
         var savedEntity = repository.save(entityToSave);
         return toDomainSchedule(savedEntity);
@@ -79,7 +80,8 @@ public class ScheduleService {
                 eventToUpdate.description(),
                 eventToUpdate.skills(),
                 eventToUpdate.startDateTime(),
-                eventToUpdate.endDateTime()
+                eventToUpdate.endDateTime(),
+                scheduleEntity.isResultsPublished()
         );
 
         var updatedEvent = repository.save(scheduleToSave);

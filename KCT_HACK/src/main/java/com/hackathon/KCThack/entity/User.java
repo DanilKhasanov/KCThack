@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,8 +88,9 @@ public class User   {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserSkill> skills = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserAchievements> achievements = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "achievement_id")
+    private Achievements achievement;
 
     @Column(name = "created_at")
     private LocalDate createdAt;
@@ -110,6 +112,10 @@ public class User   {
         if (this == o) return true;
         if (!(o instanceof User u)) return false;
         return id != null && id.equals(u.id);
+    }
+    @Transient
+    public int getAge() {
+        return Period.between(this.birthday, LocalDate.now()).getYears();
     }
 
     @Override

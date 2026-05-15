@@ -25,13 +25,22 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.skills s LEFT JOIN FETCH s.skill WHERE u.id = :id")
     Optional<User> findByIdWithSkills(String id);
 
-    @Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.achievements a LEFT JOIN FETCH a.achievements WHERE u.id = :id")
+    @Query("""
+SELECT u
+FROM User u
+LEFT JOIN FETCH u.achievement
+WHERE u.id = :id
+""")
     Optional<User> findByIdWithAchievements(String id);
 
     @Query("""
     SELECT new com.hackathon.KCThack.dto.UserRatingRawDto(
         u.fullName,
-        u.points
+        u.points,
+        u.job,
+        u.gender,
+        u.birthday,
+        u.achievement
     )
     FROM User u 
     WHERE u.role = USER

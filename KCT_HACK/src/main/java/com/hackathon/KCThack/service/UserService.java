@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -248,7 +249,7 @@ public class UserService implements UserDetailsService {
         // Загружаем достижения отдельно (второй запрос)
         User userWithAchievements = userRepository.findByIdWithAchievements(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
-        user.setAchievements(userWithAchievements.getAchievements());
+        user.setAchievement(userWithAchievements.getAchievement());
         return user;
     }
 
@@ -261,11 +262,21 @@ public class UserService implements UserDetailsService {
 
         int place = 1;
 
+
         for (UserRatingRawDto u : users) {
+            int age = Period.between(
+                    u.getBirthday(),
+                    LocalDate.now()
+            ).getYears();
             result.add(new UserRatingDto(
                     place++,
                     u.getFullName(),
-                    u.getPoints()
+                    u.getPoints(),
+                    u.getJob(),
+                    u.getGender(),
+                    age,
+                    u.getAchievements()
+
             ));
         }
 

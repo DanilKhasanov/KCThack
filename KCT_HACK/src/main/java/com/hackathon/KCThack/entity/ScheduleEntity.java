@@ -43,6 +43,9 @@ public class ScheduleEntity {
     @Column(name = "end_date", nullable = false)
     private Instant endDateTime;
 
+    @Column(name = "result_published", nullable = false)
+    private boolean resultsPublished = false;
+
     public ScheduleEntity() {
     }
 

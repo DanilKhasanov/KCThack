@@ -2,7 +2,6 @@ package com.hackathon.KCThack.controller;
 
 
 import com.hackathon.KCThack.dto.UserRatingDto;
-import com.hackathon.KCThack.dto.UserRatingRawDto;
 import com.hackathon.KCThack.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

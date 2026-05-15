@@ -9,6 +9,7 @@ import com.hackathon.KCThack.TeamManagement.model.Team;
 import com.hackathon.KCThack.TeamManagement.model.TeamMember;
 import com.hackathon.KCThack.TeamManagement.repository.*;
 import com.hackathon.KCThack.entity.User;
+import com.hackathon.KCThack.repository.EventRegistrationRepository;
 import com.hackathon.KCThack.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class TeamService {
     private final TeamHackathonRegistrationRepository teamHackathonRegistrationRepository;
     private final UserRepository userRepository;
     private final TeamProperties teamProperties;
+    private final EventRegistrationRepository eventRegistrationRepository;
 
     @Transactional
     public Team createTeam(CreateTeamRequest request) {
@@ -135,7 +137,9 @@ public class TeamService {
         teamMemberRepository.deleteAllByTeamId(teamId);
         teamJoinRequestRepository.deleteAllByTeamId(teamId);
         teamInvitationRepository.deleteAllByTeamId(teamId);
-        teamHackathonRegistrationRepository.deleteAllByTeamId(teamId);
+        eventRegistrationRepository.deleteAllByTeamId(teamId);
+//        teamHackathonRegistrationRepository.deleteAllByTeamId(teamId);
+
         teamRepository.delete(team);
     }
 
