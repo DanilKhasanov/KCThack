@@ -3,6 +3,7 @@ package com.hackathon.KCThack.controller;
 
 import com.hackathon.KCThack.dto.ChangePasswordRequest;
 import com.hackathon.KCThack.dto.UpdateUserRequest;
+import com.hackathon.KCThack.dto.UserResponseDto;
 import com.hackathon.KCThack.entity.User;
 import com.hackathon.KCThack.repository.UserRepository;
 import com.hackathon.KCThack.service.UserDetailsImpl;
@@ -32,7 +33,7 @@ public class MainController {
 
     @GetMapping("/user")
     //@PreAuthorize("isAuthenticated()")
-    public User userAccess(Authentication auth){
+    public UserResponseDto userAccess(Authentication auth){
         if (!(auth.getPrincipal() instanceof UserDetailsImpl userDetails)) {
             throw new AccessDeniedException("Unauthorized");
         }

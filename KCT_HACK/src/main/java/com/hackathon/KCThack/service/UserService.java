@@ -1,11 +1,14 @@
 package com.hackathon.KCThack.service;
 
+import com.hackathon.KCThack.TeamManagement.model.Team;
+import com.hackathon.KCThack.TeamManagement.repository.TeamMemberRepository;
 import com.hackathon.KCThack.dto.*;
 import com.hackathon.KCThack.enums.UserRole;
 import com.hackathon.KCThack.enums.UserStatus;
 import com.hackathon.KCThack.config.JwtCore;
 import com.hackathon.KCThack.exception.EmailAlreadyExistsException;
 import com.hackathon.KCThack.exception.UsernameAlreadyExistsException;
+import com.hackathon.KCThack.mapper.UserMapper;
 import com.hackathon.KCThack.repository.SkillRepository;
 import com.hackathon.KCThack.entity.Skills;
 import com.hackathon.KCThack.entity.UserSkill;
@@ -45,6 +48,8 @@ public class UserService implements UserDetailsService {
     private final JwtCore jwtCore;
     private final UserSkillRepository userSkillRepository;
     private final SkillRepository skillRepository;
+    private final TeamMemberRepository teamMemberRepository;
+    private final UserMapper userMapper;
 
 
     @Autowired
@@ -54,7 +59,9 @@ public class UserService implements UserDetailsService {
                        JwtCore jwtCore,
 
                        UserSkillRepository userSkillRepository,
-                       SkillRepository skillRepository
+                       SkillRepository skillRepository,
+                       TeamMemberRepository teamMemberRepository,
+                       UserMapper userMapper
 
                        ) {
         this.userRepository = userRepository;
@@ -63,6 +70,8 @@ public class UserService implements UserDetailsService {
         this.jwtCore = jwtCore;
         this.userSkillRepository = userSkillRepository;
         this.skillRepository = skillRepository;
+        this.teamMemberRepository = teamMemberRepository;
+        this.userMapper = userMapper;
 
     }
 
@@ -243,14 +252,18 @@ public class UserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
     }
     @Transactional
-    public User findUserWithDetails(String id) {
+    public UserResponseDto findUserWithDetails(String id) {
         User user = userRepository.findByIdWithSkills(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
         // Загружаем достижения отдельно (второй запрос)
         User userWithAchievements = userRepository.findByIdWithAchievements(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + id));
         user.setAchievement(userWithAchievements.getAchievement());
-        return user;
+        Team team = teamMemberRepository.findTeamByUserId(id)
+                .orElse(null);
+        user.setTeam(team);
+        UserResponseDto dto = userMapper.toDto(user);
+        return dto;
     }
 
 

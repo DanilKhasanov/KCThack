@@ -50,6 +50,8 @@ public class TeamService {
         team.setIsActive(true);
 
         Team saved = teamRepository.save(team);
+        user.setTeam(team);
+
 
         TeamMember creator = new TeamMember();
         creator.setTeam(saved);

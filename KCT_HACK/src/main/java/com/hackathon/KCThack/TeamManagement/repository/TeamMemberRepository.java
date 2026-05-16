@@ -1,5 +1,6 @@
 package com.hackathon.KCThack.TeamManagement.repository;
 
+import com.hackathon.KCThack.TeamManagement.model.Team;
 import com.hackathon.KCThack.TeamManagement.model.TeamMember;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -36,4 +37,11 @@ public interface TeamMemberRepository
         WHERE tm.team.id = :teamId
     """)
     void deleteAllByTeamId(@Param("teamId") String teamId);
+
+    @Query("""
+    SELECT tm.team
+    FROM TeamMember tm
+    WHERE tm.user.id = :userId
+""")
+    Optional<Team> findTeamByUserId(@Param("userId") String userId);
 }

@@ -1,6 +1,7 @@
 package com.hackathon.KCThack.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.hackathon.KCThack.TeamManagement.model.Team;
 import com.hackathon.KCThack.enums.*;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -100,6 +101,10 @@ public class User   {
 
     @Column(name = "token_version", nullable = false)
     private int tokenVersion = 0;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
 
     @PrePersist
     @PreUpdate

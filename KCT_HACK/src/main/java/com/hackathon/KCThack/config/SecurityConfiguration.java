@@ -82,6 +82,11 @@ public class SecurityConfiguration {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/judge/**").hasRole("JUDGE")
                         .requestMatchers("/api/events/**").hasAnyRole("USER","ADMIN","JUDGE")
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class);
