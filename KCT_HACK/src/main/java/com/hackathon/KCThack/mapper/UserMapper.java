@@ -11,8 +11,12 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
+    @Mapping(target = "id", source = "user.id")
+    @Mapping(target = "name", source = "user.name")
+    @Mapping(target = "createdAt", source = "user.createdAt")
     @Mapping(target = "age", expression = "java(user.getAge())")
-    UserResponseDto toDto(User user);
+    @Mapping(target = "team", source = "team")
+    UserResponseDto toDto(User user, Team team);
 
     TeamShortResponseDto toTeamDto(Team team);
 

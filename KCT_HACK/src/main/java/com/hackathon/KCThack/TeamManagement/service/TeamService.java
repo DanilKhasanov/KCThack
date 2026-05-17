@@ -1,6 +1,7 @@
 package com.hackathon.KCThack.TeamManagement.service;
 
 
+import com.hackathon.KCThack.Capcha.RecaptchaVerificationService;
 import com.hackathon.KCThack.TeamManagement.config.TeamProperties;
 import com.hackathon.KCThack.TeamManagement.dto.CreateTeamRequest;
 import com.hackathon.KCThack.TeamManagement.dto.TeamMemberDto;
@@ -13,6 +14,9 @@ import com.hackathon.KCThack.repository.EventRegistrationRepository;
 import com.hackathon.KCThack.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -33,6 +37,7 @@ public class TeamService {
     private final UserRepository userRepository;
     private final TeamProperties teamProperties;
     private final EventRegistrationRepository eventRegistrationRepository;
+    private static final Logger log = LoggerFactory.getLogger(TeamService.class);
 
     @Transactional
     public Team createTeam(CreateTeamRequest request) {
@@ -50,7 +55,7 @@ public class TeamService {
         team.setIsActive(true);
 
         Team saved = teamRepository.save(team);
-        user.setTeam(team);
+
 
 
         TeamMember creator = new TeamMember();
@@ -95,7 +100,7 @@ public class TeamService {
 
     @Transactional(readOnly = true)
     public Page<Team> getAll(Pageable pageable) {
-        return teamRepository.findAll(pageable);
+        return teamRepository.findAllWithCreator(pageable);
     }
 
     @Transactional(readOnly = true)
@@ -136,11 +141,25 @@ public class TeamService {
     public void deleteTeam(String teamId) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new EntityNotFoundException("Команда не найдена: " + teamId));
+
+//        List<User> usersWithThisTeam = userRepository.findByCurrentTeamId(teamId); // нужно добавить метод в UserRepository
+//        for (User user : usersWithThisTeam) {
+//            log.info("username: {}, teamId: {}",
+//                    user.getFullName(),
+//                    user.getTeam().getId());
+//            Hibernate.initialize(user.getTeam());
+//            user.setTeam(null);
+//        }
+//        userRepository.saveAll(usersWithThisTeam);
+//        userRepository.flush();
+
         teamMemberRepository.deleteAllByTeamId(teamId);
+
         teamJoinRequestRepository.deleteAllByTeamId(teamId);
+
         teamInvitationRepository.deleteAllByTeamId(teamId);
+
         eventRegistrationRepository.deleteAllByTeamId(teamId);
-//        teamHackathonRegistrationRepository.deleteAllByTeamId(teamId);
 
         teamRepository.delete(team);
     }

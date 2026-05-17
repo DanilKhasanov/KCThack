@@ -1,11 +1,15 @@
 package com.hackathon.KCThack.TeamManagement.controller;
 
+import com.hackathon.KCThack.Capcha.RecaptchaVerificationService;
 import com.hackathon.KCThack.TeamManagement.dto.TeamDto;
 import com.hackathon.KCThack.TeamManagement.dto.UpdateTeamRequest;
 import com.hackathon.KCThack.TeamManagement.dto.UpdateTeamRequest;
 import com.hackathon.KCThack.TeamManagement.service.TeamService;
 import com.hackathon.KCThack.TeamManagement.service.TeamService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/teams")
@@ -21,6 +26,7 @@ import java.util.Map;
 public class AdminTeamController {
 
     private final TeamService teamService;
+    private static final Logger log = LoggerFactory.getLogger(AdminTeamController.class);
 
     @GetMapping
     public Page<TeamDto> getAll(Pageable pageable) {
@@ -39,6 +45,7 @@ public class AdminTeamController {
 
     @DeleteMapping("/{teamId}")
     public Map<String, String> delete(@PathVariable String teamId) {
+        log.info("Called deleteTeam with id: " + teamId);
         teamService.deleteTeam(teamId);
         return Map.of("message", "Команда удалена");
     }

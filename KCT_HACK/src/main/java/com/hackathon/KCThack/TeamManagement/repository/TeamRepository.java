@@ -30,6 +30,10 @@ public interface TeamRepository extends JpaRepository<Team, String> {
 
     List<Team> findByNameContainingIgnoreCase(String query);
 
+    @Query(value = "SELECT t FROM Team t LEFT JOIN FETCH t.creator",
+            countQuery = "SELECT COUNT(t) FROM Team t")
+    Page<Team> findAllWithCreator(Pageable pageable);
+
     @Query("""
     SELECT t FROM Team t
     WHERE t.creator.id = :userId

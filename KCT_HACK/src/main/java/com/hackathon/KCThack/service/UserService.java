@@ -277,8 +277,8 @@ public class UserService implements UserDetailsService {
         user.setAchievement(userWithAchievements.getAchievement());
         Team team = teamMemberRepository.findTeamByUserId(id)
                 .orElse(null);
-        user.setTeam(team);
-        UserResponseDto dto = userMapper.toDto(user);
+
+        UserResponseDto dto = userMapper.toDto(user, team);
         return dto;
     }
 

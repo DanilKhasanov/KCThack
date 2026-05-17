@@ -2,6 +2,7 @@ package com.hackathon.KCThack.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.hackathon.KCThack.TeamManagement.model.Team;
+import com.hackathon.KCThack.TeamManagement.repository.TeamMemberRepository;
 import com.hackathon.KCThack.enums.*;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -24,6 +25,7 @@ import java.util.List;
 )
 @Entity
 public class User   {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -102,9 +104,9 @@ public class User   {
     @Column(name = "token_version", nullable = false)
     private int tokenVersion = 0;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "team_id")
-    private Team team;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "team_id")
+//    private Team team;
 
     @PrePersist
     @PreUpdate
