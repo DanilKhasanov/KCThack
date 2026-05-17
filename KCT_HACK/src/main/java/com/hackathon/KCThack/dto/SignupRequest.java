@@ -44,6 +44,9 @@ public class SignupRequest {
 
     private Gender gender;
 
+    @NotBlank(message = "Captcha token is required")
+    private String captchaToken;
+
 
 
 }

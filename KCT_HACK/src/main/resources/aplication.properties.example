@@ -23,3 +23,9 @@ data.user.pass=${USER PASSWORD}
 data.admin.pass=${ADMIN PASSWORD}
 
 data.judge.pass=${JUDGE PASSWORD}
+
+recaptcha.enabled=true
+recaptcha.secret-key=${RECAPTCHA KEY}
+recaptcha.verify-url=https://www.google.com/recaptcha/api/siteverify
+recaptcha.min-score=0.5
+recaptcha.expected-action = login

@@ -1,11 +1,14 @@
 package com.hackathon.KCThack.service;
 
+import com.hackathon.KCThack.Capcha.RecaptchaVerificationService;
+import com.hackathon.KCThack.Capcha.dto.RecaptchaVerifyResponse;
 import com.hackathon.KCThack.TeamManagement.model.Team;
 import com.hackathon.KCThack.TeamManagement.repository.TeamMemberRepository;
 import com.hackathon.KCThack.dto.*;
 import com.hackathon.KCThack.enums.UserRole;
 import com.hackathon.KCThack.enums.UserStatus;
 import com.hackathon.KCThack.config.JwtCore;
+import com.hackathon.KCThack.exception.CaptchaVerificationException;
 import com.hackathon.KCThack.exception.EmailAlreadyExistsException;
 import com.hackathon.KCThack.exception.UsernameAlreadyExistsException;
 import com.hackathon.KCThack.mapper.UserMapper;
@@ -50,6 +53,7 @@ public class UserService implements UserDetailsService {
     private final SkillRepository skillRepository;
     private final TeamMemberRepository teamMemberRepository;
     private final UserMapper userMapper;
+    private final RecaptchaVerificationService recaptchaVerificationService;
 
 
     @Autowired
@@ -61,7 +65,8 @@ public class UserService implements UserDetailsService {
                        UserSkillRepository userSkillRepository,
                        SkillRepository skillRepository,
                        TeamMemberRepository teamMemberRepository,
-                       UserMapper userMapper
+                       UserMapper userMapper,
+                       RecaptchaVerificationService recaptchaVerificationService
 
                        ) {
         this.userRepository = userRepository;
@@ -72,6 +77,7 @@ public class UserService implements UserDetailsService {
         this.skillRepository = skillRepository;
         this.teamMemberRepository = teamMemberRepository;
         this.userMapper = userMapper;
+        this.recaptchaVerificationService = recaptchaVerificationService;
 
     }
 
@@ -92,6 +98,16 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public User userToSignUp(@Valid SignupRequest signupRequest){
+
+        RecaptchaVerifyResponse captchaResponse = recaptchaVerificationService.verify(
+                signupRequest.getCaptchaToken(),
+                null
+        );
+
+        if (!captchaResponse.isSuccess()) {
+            throw new CaptchaVerificationException("reCAPTCHA verification failed: " +
+                    String.join(", ", captchaResponse.getErrorCodes()));
+        }
 
         if (userRepository.existsUserByEmail(signupRequest.getEmail())) {
             throw new EmailAlreadyExistsException("Выберите другую почту");
