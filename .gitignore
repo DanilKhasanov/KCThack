@@ -1,6 +1,9 @@
+# Repository root IDE settings
+/.idea/
+
 HELP.md
 target/
-.mvn/wrapper/maven-wrapper.jar
+/KCT_HACK/.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
@@ -20,11 +23,11 @@ target/
 *.ipr
 
 ### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+/KCT_HACK/nbproject/private/
+/KCT_HACK/nbbuild/
+/KCT_HACK/dist/
+/KCT_HACK/nbdist/
+/KCT_HACK/.nb-gradle/
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
